@@ -32,7 +32,7 @@
         </javaModelGenerator>
 
         <sqlMapGenerator
-                targetPackage="mapper"
+                targetPackage="com.atguigu.crud.dao"
                 targetProject="src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>

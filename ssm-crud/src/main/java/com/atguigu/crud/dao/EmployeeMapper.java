@@ -2,8 +2,9 @@ package com.atguigu.crud.dao;
 
 import com.atguigu.crud.bean.Employee;
 import com.atguigu.crud.bean.EmployeeExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface EmployeeMapper {
     int countByExample(EmployeeExample example);
@@ -19,6 +20,10 @@ public interface EmployeeMapper {
     List<Employee> selectByExample(EmployeeExample example);
 
     Employee selectByPrimaryKey(Integer empId);
+
+    List<Employee> selectByExampleWithDept(EmployeeExample example);
+
+    Employee selectByPrimaryKeyWithDept(Integer empId);
 
     int updateByExampleSelective(@Param("record") Employee record, @Param("example") EmployeeExample example);
 
