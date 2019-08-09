@@ -62,7 +62,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-primary" id="btn_save_emp">保存</button>
             </div>
         </div>
     </div>
@@ -115,6 +115,8 @@
     </div>
 </div>
 <script>
+    var totalRecord;
+
     $(function () {
         toPage(1);
     });
@@ -173,6 +175,7 @@
         var pageInfoArea = $("#page_info_area");
         pageInfoArea.empty();
         pageInfoArea.append("当前" + pageInfo.pageNum + "页, 总" + pageInfo.pages + "页, 总" + pageInfo.total + "条记录");
+        totalRecord = pageInfo.pages;
     }
 
     function buildPageNav(result) {
@@ -251,6 +254,22 @@
             }
         });
     }
+
+    $("#btn_save_emp").click(function () {
+        // 保存员工
+        $.ajax({
+            url:"emp",
+            type: "POST",
+            data: $('#empAddModal form').serialize(),
+            success: function (result) {
+                alert(result.msg);
+                // 员工保存成功后需要关闭模态框, 并跳转到最后一页
+                $('#empAddModal').modal('hide');
+                toPage(totalRecord + 1);
+
+            }
+        });
+    })
 </script>
 
 </body>
