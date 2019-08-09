@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.List;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:applicationContext.xml"})
 public class MapperTest {
@@ -30,8 +32,8 @@ public class MapperTest {
 
 //        employeeMapper.insertSelective(new Employee(null, "Jerry", "M", "Jerry@atguigu.com", 1));
         // 批量插入多个员工
-        EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
-        Employee employee = mapper.selectByPrimaryKey(1);
-        System.out.println("employee = " + employee.getEmpName());
+//        EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+        List<Employee> employees = employeeMapper.selectByExampleWithDept(null);
+        System.out.println("employee = " + employees.get(0));
     }
 }

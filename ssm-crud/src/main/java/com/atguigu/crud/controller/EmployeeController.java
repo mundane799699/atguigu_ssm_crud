@@ -20,7 +20,7 @@ public class EmployeeController {
 
     @RequestMapping("/emps")
     public String getEmps(@RequestParam(value = "pn", defaultValue = "1") Integer pn, Model model) {
-        PageHelper.startPage(pn, 5);
+        PageHelper.startPage(pn, 5, "emp_id asc");
         List<Employee> emps = employeeService.getAll();
         PageInfo<Employee> page = new PageInfo<>(emps, 5);
         model.addAttribute("pageInfo", page);
