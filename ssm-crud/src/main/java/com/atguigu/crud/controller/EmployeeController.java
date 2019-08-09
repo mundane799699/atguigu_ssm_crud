@@ -20,6 +20,7 @@ public class EmployeeController {
     @Autowired
     private EmployeeService employeeService;
 
+
     @RequestMapping("/emps")
     @ResponseBody
     public Msg getEmpsWithJson(@RequestParam(value = "pn", defaultValue = "1") Integer pn) {
@@ -28,6 +29,7 @@ public class EmployeeController {
         PageInfo<Employee> page = new PageInfo<>(emps, 5);
         return Msg.success().add("pageInfo", page);
     }
+
 
     // @RequestMapping("/emps")
     public String getEmps(@RequestParam(value = "pn", defaultValue = "1") Integer pn, Model model) {
