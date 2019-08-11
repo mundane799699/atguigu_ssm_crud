@@ -36,4 +36,9 @@ public class EmployeeService {
         // true表示没有, false表示已经存在
         return count == 0;
     }
+
+    public Employee getEmp(Integer id) {
+        Employee employee = employeeMapper.selectByPrimaryKey(id);
+        return employee;
+    }
 }
