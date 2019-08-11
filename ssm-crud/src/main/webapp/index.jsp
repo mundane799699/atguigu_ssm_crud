@@ -22,7 +22,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
                 <h4 class="modal-title" id="myModalLabel">员工添加</h4>
             </div>
             <div class="modal-body">
@@ -30,13 +31,17 @@
                     <div class="form-group">
                         <label for="empname_add_input" class="col-sm-2 control-label">empName</label>
                         <div class="col-sm-10">
-                            <input type="text" name="empName" class="form-control" id="empname_add_input" placeholder="empName">
+                            <input type="text" name="empName" class="form-control" id="empname_add_input"
+                                   placeholder="empName">
+                            <span class="help-block"></span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="email_add_input" class="col-sm-2 control-label">email</label>
                         <div class="col-sm-10">
-                            <input type="text" name="email" class="form-control" id="email_add_input" placeholder="email@atguigu.com">
+                            <input type="text" name="email" class="form-control" id="email_add_input"
+                                   placeholder="email@atguigu.com">
+                            <span class="help-block"></span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -229,8 +234,17 @@
         navEle.appendTo("#page_nav_area");
     }
 
+    function resetForm(ele) {
+        $(ele)[0].reset();
+        // 清空表单样式
+        $(ele).find("*").removeClass("has-error has success");
+        $(ele).find(".help-block").text("");
+    }
+
     // 点击新增按钮弹出模态框
-    $('#emp_add_modal_btn').click(function(){
+    $('#emp_add_modal_btn').click(function () {
+        // 清除表单数据以及样式
+        resetForm("#empAddModal form");
         // 发送ajax请求,查出部门信息,显示在下拉列表
         getDepts();
         // 弹出模态框
@@ -239,14 +253,14 @@
         });
     });
 
-    function getDepts(){
+    function getDepts() {
         $.ajax({
             url: "depts",
             type: "GET",
-            success: function(result) {
+            success: function (result) {
                 // 显示部门信息在下拉列表中
                 var depts = result.extend.depts;
-                $.each(depts, function(){
+                $.each(depts, function () {
                     var optionEle = $("<option></option>").append(this.deptName).attr("value", this.deptId);
                     optionEle.appendTo($("#select_add_dept"));
                 });
@@ -255,14 +269,87 @@
         });
     }
 
+    // 校验表单数据
+    function validateAddForm() {
+        var empName = $("#empname_add_input").val();
+        var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/;
+        if (!regName.test(empName)) {
+            // alert("用户名可以是2-5位中文或者6-16位英文和数字的组合");
+            // $("#empname_add_input").parent().addClass("has-error");
+            // $("#empname_add_input").next("span").text("用户名可以是2-5位中文或者6-16位英文和数字的组合");
+            // 应该清空这个元素之前的样式
+            showValidateMsg("#empname_add_input", "error", "用户名必须是2-5位中文或者6-16位英文和数字的组合");
+            return false;
+        } else {
+            // $("#empname_add_input").parent().addClass("has-success");
+            // $("#empname_add_input").next("span").text("");
+            showValidateMsg("#empname_add_input", "success", "");
+        }
+
+        var email = $("#email_add_input").val();
+        var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+        if (!regEmail.test(email)) {
+            // alert("邮箱格式不正确");
+            // $("#email_add_input").parent().addClass("has-error");
+            // $("#email_add_input").next("span").text("邮箱格式不正确");
+            showValidateMsg("#email_add_input", "error", "邮箱格式不正确");
+            return false;
+        } else {
+            // $("#email_add_input").parent().addClass("has-success");
+            // $("#email_add_input").next("span").text("");
+            showValidateMsg("#email_add_input", "success", "");
+        }
+        return true;
+    }
+
+    function showValidateMsg(ele, status, msg) {
+        // 清除当前元素的校验状态
+        $(ele).parent().removeClass("has-success has-error");
+        $(ele).next("span").text("");
+        if ("success" === status) {
+            $(ele).parent().addClass("has-success");
+            $(ele).next("span").text(msg);
+        } else if ("error" === status) {
+            $(ele).parent().addClass("has-error");
+            $(ele).next("span").text(msg);
+        }
+
+    }
+
+    $("#empname_add_input").change(function () {
+        var empName = this.value;
+        $.ajax({
+            url: "checkuser",
+            data: "empName=" + empName,
+            type: "POST",
+            success: function (result) {
+                if (result.code == 100) {
+                    showValidateMsg("#empname_add_input", "success", "用户名可用");
+                    $("#btn_save_emp").attr("ajax-va", "success");
+                } else {
+                    showValidateMsg("#empname_add_input", "error", result.extend.va_msg);
+                    $("#btn_save_emp").attr("ajax-va", "error");
+                }
+            }
+
+        });
+    });
+
     $("#btn_save_emp").click(function () {
+        // 数据校验
+        if (!validateAddForm()) {
+            return;
+        }
+        if($(this).attr("ajax-va")==='error'){
+            return;
+        }
         // 保存员工
         $.ajax({
-            url:"emp",
+            url: "emp",
             type: "POST",
             data: $('#empAddModal form').serialize(),
             success: function (result) {
-                alert(result.msg);
+                // alert(result.msg);
                 // 员工保存成功后需要关闭模态框, 并跳转到最后一页
                 $('#empAddModal').modal('hide');
                 toPage(totalRecord + 1);
