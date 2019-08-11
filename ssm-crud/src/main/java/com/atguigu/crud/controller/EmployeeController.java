@@ -8,12 +8,17 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class EmployeeController {
@@ -49,7 +54,15 @@ public class EmployeeController {
 
     @RequestMapping(value = "/emp", method = RequestMethod.POST)
     @ResponseBody
-    public Msg saveEmp(Employee employee) {
+    public Msg saveEmp(@Valid Employee employee, BindingResult result) {
+        if (result.hasErrors()) {
+            Map<String, String> map = new HashMap<>();
+            List<FieldError> errors = result.getFieldErrors();
+            for (FieldError fieldError : errors) {
+                map.put(fieldError.getField(), fieldError.getDefaultMessage());
+            }
+            return Msg.fail().add("errorFields", map);
+        }
         employeeService.saveEmp(employee);
         return Msg.success();
     }

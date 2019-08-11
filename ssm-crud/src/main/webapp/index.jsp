@@ -274,29 +274,19 @@
         var empName = $("#empname_add_input").val();
         var regName = /(^[a-zA-Z0-9_-]{6,16}$)|(^[\u2E80-\u9FFF]{2,5})/;
         if (!regName.test(empName)) {
-            // alert("用户名可以是2-5位中文或者6-16位英文和数字的组合");
-            // $("#empname_add_input").parent().addClass("has-error");
-            // $("#empname_add_input").next("span").text("用户名可以是2-5位中文或者6-16位英文和数字的组合");
             // 应该清空这个元素之前的样式
             showValidateMsg("#empname_add_input", "error", "用户名必须是2-5位中文或者6-16位英文和数字的组合");
             return false;
         } else {
-            // $("#empname_add_input").parent().addClass("has-success");
-            // $("#empname_add_input").next("span").text("");
             showValidateMsg("#empname_add_input", "success", "");
         }
 
         var email = $("#email_add_input").val();
         var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
         if (!regEmail.test(email)) {
-            // alert("邮箱格式不正确");
-            // $("#email_add_input").parent().addClass("has-error");
-            // $("#email_add_input").next("span").text("邮箱格式不正确");
             showValidateMsg("#email_add_input", "error", "邮箱格式不正确");
             return false;
         } else {
-            // $("#email_add_input").parent().addClass("has-success");
-            // $("#email_add_input").next("span").text("");
             showValidateMsg("#email_add_input", "success", "");
         }
         return true;
@@ -340,7 +330,8 @@
         if (!validateAddForm()) {
             return;
         }
-        if($(this).attr("ajax-va")==='error'){
+        // 利用之前保存下来的checkUser的结果进行校验
+        if ($(this).attr("ajax-va") === 'error') {
             return;
         }
         // 保存员工
@@ -349,11 +340,22 @@
             type: "POST",
             data: $('#empAddModal form').serialize(),
             success: function (result) {
-                // alert(result.msg);
-                // 员工保存成功后需要关闭模态框, 并跳转到最后一页
-                $('#empAddModal').modal('hide');
-                toPage(totalRecord + 1);
+                // 100是成功
+                if ("100" === result.code) {
+                    // 员工保存成功后需要关闭模态框, 并跳转到最后一页
+                    $('#empAddModal').modal('hide');
+                    toPage(totalRecord + 1);
+                } else {
+                    var errofFields = result.extend.errorFields;
+                    // 显示失败信息
+                    if (undefined !== errofFields.email) {
+                        showValidateMsg("#email_add_input", "error", errofFields.email);
+                    }
+                    if (undefined !== errofFields.empName) {
+                        showValidateMsg("#empname_add_input", "error", errofFields.empName);
+                    }
 
+                }
             }
         });
     })
