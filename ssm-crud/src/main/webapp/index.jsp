@@ -56,7 +56,7 @@
                         <label for="email_add_input" class="col-sm-2 control-label">deptName</label>
                         <div class="col-sm-4">
                             <%-- 部门提交部门id即可 --%>
-                            <select class="form-control" name="dId" id="select_add_dept"></select>
+                            <select class="form-control" name="dId" id="select_update_dept"></select>
                         </div>
                     </div>
 
@@ -326,6 +326,24 @@
         });
     }
 
+    function getDepts2(ele, btn_edit) {
+        // 清空之前下拉列表的值
+        $(ele).empty();
+        $.ajax({
+            url: "depts",
+            type: "GET",
+            success: function (result) {
+                // 显示部门信息在下拉列表中
+                var depts = result.extend.depts;
+                $.each(depts, function () {
+                    var optionEle = $("<option></option>").append(this.deptName).attr("value", this.deptId);
+                    optionEle.appendTo(ele);
+                });
+                getEmp(btn_edit.attr("edit-id"));
+            }
+        });
+    }
+
     // 校验表单数据
     function validateAddForm() {
         var empName = $("#empname_add_input").val();
@@ -418,9 +436,8 @@
     });
 
     $(document).on("click", ".btn_edit", function(){
-        // 查出员工信息, 显示员工信息
-        getDepts("#empUpdateModal select")
-        getEmp($(this).attr("edit-id"));
+        // 查出部门信息, 查出之后再设置select的状态, 否则先设置了select的状态, 再初始化部门信息会导致select错乱
+        getDepts2("#empUpdateModal select", $(this))
         // 弹出模态框
         $('#empUpdateModal').modal({
             backdrop: 'static'
