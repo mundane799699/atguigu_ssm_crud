@@ -49,6 +49,12 @@ public class EmployeeController {
         return Msg.success().add("pageInfo", page);
     }
 
+    /**
+     * 新增员工信息
+     * @param employee
+     * @param result
+     * @return
+     */
     @RequestMapping(value = "/emp", method = RequestMethod.POST)
     @ResponseBody
     public Msg saveEmp(@Valid Employee employee, BindingResult result) {
@@ -71,6 +77,19 @@ public class EmployeeController {
         return Msg.success().add("emp", employee);
     }
 
+
+
+    /**
+     * 更新员工信息
+     * @param employee
+     * @return
+     */
+    @RequestMapping(value = "/emp/{empId}", method = RequestMethod.PUT)
+    @ResponseBody
+    public Msg saveEmp(Employee employee) {
+        employeeService.updateEmp(employee);
+        return Msg.success();
+    }
 
     // @RequestMapping("/emps")
     public String getEmps(@RequestParam(value = "pn", defaultValue = "1") Integer pn, Model model) {

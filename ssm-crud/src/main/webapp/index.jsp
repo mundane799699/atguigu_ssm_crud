@@ -174,6 +174,7 @@
 </div>
 <script>
     var totalRecord;
+    var currentNum;
 
     $(function () {
         toPage(1);
@@ -236,6 +237,7 @@
         pageInfoArea.empty();
         pageInfoArea.append("当前" + pageInfo.pageNum + "页, 总" + pageInfo.pages + "页, 总" + pageInfo.total + "条记录");
         totalRecord = pageInfo.pages;
+        currentNum = pageInfo.pageNum;
     }
 
     function buildPageNav(result) {
@@ -438,6 +440,8 @@
     $(document).on("click", ".btn_edit", function(){
         // 查出部门信息, 查出之后再设置select的状态, 否则先设置了select的状态, 再初始化部门信息会导致select错乱
         getDepts2("#empUpdateModal select", $(this))
+        // 把员工的id传递给模态框的更新按钮
+        $("#btn_update_emp").attr("edit-id", $(this).attr("edit-id"));
         // 弹出模态框
         $('#empUpdateModal').modal({
             backdrop: 'static'
@@ -457,6 +461,32 @@
             }
         });
     }
+
+    // 点击更新, 更新员工信息
+    $("#btn_update_emp").click(function(){
+        // 验证邮箱是否合法
+        var email = $("#email_update_input").val();
+        var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+        if (!regEmail.test(email)) {
+            showValidateMsg("#email_update_input", "error", "邮箱格式不正确");
+            return;
+        } else {
+            showValidateMsg("#email_update_input", "success", "");
+        }
+        // 发送ajax请求保存更新的员工数据
+        $.ajax({
+            url: "emp/" + $(this).attr("edit-id"),
+            type: "PUT",
+            data: $("#empUpdateModal form").serialize(),
+            success: function (result) {
+                // 关闭模态框
+                $("#empUpdateModal").modal("hide");
+                // 回到本页面
+                toPage(currentNum);
+            }
+        });
+
+    });
 </script>
 
 </body>
