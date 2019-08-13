@@ -12,9 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class EmployeeController {
@@ -50,6 +48,7 @@ public class EmployeeController {
 
     /**
      * 新增员工信息
+     *
      * @param employee
      * @param result
      * @return
@@ -77,9 +76,9 @@ public class EmployeeController {
     }
 
 
-
     /**
      * 更新员工信息
+     *
      * @param employee
      * @return
      */
@@ -90,10 +89,26 @@ public class EmployeeController {
         return Msg.success();
     }
 
+    /**
+     * 删除员工, 单个批量二合一
+     *
+     * @param ids
+     * @return
+     */
     @ResponseBody
-    @RequestMapping(value = "/emp/{id}", method = RequestMethod.DELETE)
-    public Msg deleteEmpById(@PathVariable("id") Integer id) {
-        employeeService.deleteEmp(id);
+    @RequestMapping(value = "/emp/{ids}", method = RequestMethod.DELETE)
+    public Msg deleteEmpById(@PathVariable("ids") String ids) {
+        if (ids.contains("-")) {
+            String[] strIds = ids.split("-");
+            List<Integer> idList = new ArrayList<>();
+            for (String strId : strIds) {
+                idList.add(Integer.parseInt(strId));
+            }
+            employeeService.deleteBatch(idList);
+        } else {
+            Integer id = Integer.parseInt(ids);
+            employeeService.deleteEmp(id);
+        }
         return Msg.success();
     }
 

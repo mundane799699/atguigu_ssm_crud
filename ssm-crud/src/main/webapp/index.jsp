@@ -45,7 +45,8 @@
                         <label for="email_add_input" class="col-sm-2 control-label">gender</label>
                         <div class="col-sm-10">
                             <label class="radio-inline">
-                                <input type="radio" name="gender" id="gender1_update_input" value="M" checked="checked"> 男
+                                <input type="radio" name="gender" id="gender1_update_input" value="M" checked="checked">
+                                男
                             </label>
                             <label class="radio-inline">
                                 <input type="radio" name="gender" id="gender2_update_input" value="F"> 女
@@ -137,7 +138,7 @@
     <div class="row">
         <div class="col-md-4 col-md-offset-8">
             <button class="btn btn-primary" id="emp_add_modal_btn">新增</button>
-            <button class="btn btn-danger">删除</button>
+            <button class="btn btn-danger" id="btn_delete_all">删除</button>
         </div>
     </div>
     <%--显示表格数据--%>
@@ -177,7 +178,7 @@
 </div>
 <script>
     var totalRecord;
-    var currentNum;
+    var currentPage;
 
     $(function () {
         toPage(1);
@@ -244,7 +245,7 @@
         pageInfoArea.empty();
         pageInfoArea.append("当前" + pageInfo.pageNum + "页, 总" + pageInfo.pages + "页, 总" + pageInfo.total + "条记录");
         totalRecord = pageInfo.pages;
-        currentNum = pageInfo.pageNum;
+        currentPage = pageInfo.pageNum;
     }
 
     function buildPageNav(result) {
@@ -444,7 +445,7 @@
         });
     });
 
-    $(document).on("click", ".btn_edit", function(){
+    $(document).on("click", ".btn_edit", function () {
         // 查出部门信息, 查出之后再设置select的状态, 否则先设置了select的状态, 再初始化部门信息会导致select错乱
         getDepts2("#empUpdateModal select", $(this))
         // 把员工的id传递给模态框的更新按钮
@@ -459,7 +460,7 @@
         $.ajax({
             url: "emp/" + id,
             type: "GET",
-            success: function(result){
+            success: function (result) {
                 var emp = result.extend.emp;
                 $("#empname_update_static").text(emp.empName);
                 $("#email_update_input").val(emp.email);
@@ -470,7 +471,7 @@
     }
 
     // 点击更新, 更新员工信息
-    $("#btn_update_emp").click(function(){
+    $("#btn_update_emp").click(function () {
         // 验证邮箱是否合法
         var email = $("#email_update_input").val();
         var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
@@ -489,23 +490,23 @@
                 // 关闭模态框
                 $("#empUpdateModal").modal("hide");
                 // 回到本页面
-                toPage(currentNum);
+                toPage(currentPage);
             }
         });
 
     });
 
     // 单个删除
-    $(document).on("click", ".btn_delete", function(){
-        var empName = $(this).parents("tr").find("td:eq(1)").text();
+    $(document).on("click", ".btn_delete", function () {
+        var empName = $(this).parents("tr").find("td:eq(2)").text();
         var empId = $(this).attr("del-id");
-        if(confirm("确认删除【"+empName+"】吗?")){
+        if (confirm("确认删除【" + empName + "】吗?")) {
             $.ajax({
                 url: "emp/" + empId,
                 type: "DELETE",
-                success: function(result){
+                success: function (result) {
                     alert(result.msg);
-                    toPage(currentNum);
+                    toPage(currentPage);
                 }
             });
         }
@@ -513,14 +514,38 @@
     });
 
     // 全选/全不选
-    $("#check_all").click(function(){
+    $("#check_all").click(function () {
         var isChecked = $(this).prop("checked");
         $(".check_item").prop("checked", isChecked);
     });
 
     $(document).on("click", ".check_item", function () {
-        var isAllChecked = $(".check_item:checked").length===$(".check_item").length;
+        var isAllChecked = $(".check_item:checked").length === $(".check_item").length;
         $("#check_all").prop("checked", isAllChecked);
+    });
+
+    // 点击全部删除, 就批量删除
+    $("#btn_delete_all").click(function () {
+        var empNames = "";
+        var del_idstr = "";
+        $.each($(".check_item:checked"), function () {
+            var empName = $(this).parents("tr").find("td:eq(2)").text();
+            var empId = $(this).parents("tr").find("td:eq(1)").text();
+            empNames = empNames + empName + ",";
+            del_idstr = del_idstr + empId + "-";
+        });
+        empNames = empNames.substring(0, empNames.length - 1);
+        del_idstr = del_idstr.substring(0, del_idstr.length - 1);
+        if (confirm("确认删除【" + empNames + "】吗?")) {
+            $.ajax({
+                url: "emp/" + del_idstr,
+                type: "DELETE",
+                success: function(result) {
+                    alert(result.msg);
+                    toPage(currentPage);
+                }
+            });
+        }
     });
 </script>
 
