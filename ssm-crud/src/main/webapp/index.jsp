@@ -146,6 +146,9 @@
             <table class="table table-hover" id="emps_table">
                 <thead>
                 <tr>
+                    <th>
+                        <input type="checkbox" id="check_all"/>
+                    </th>
                     <th>#</th>
                     <th>empName</th>
                     <th>gender</th>
@@ -200,6 +203,7 @@
         $('#emps_table tbody').empty();
         var emps = result.extend.pageInfo.list;
         $.each(emps, function (index, item) {
+            var checkBoxTd = $("<td><input type='checkbox' class='check_item'/></td>");
             var idTd = $("<td></td>").append(item.empId);
             var nameTd = $("<td></td>").append(item.empName);
             var gender = item.gender === 'M' ? '男' : '女';
@@ -222,7 +226,8 @@
             btnDelete.attr("del-id", item.empId);
 
             var tdBtn = $("<td></td>").append(btnEdit).append(" ").append(btnDelete);
-            $("<tr></tr>").append(idTd)
+            $("<tr></tr>").append(checkBoxTd)
+                .append(idTd)
                 .append(nameTd)
                 .append(genderTd)
                 .append(emailTd)
@@ -505,6 +510,17 @@
             });
         }
 
+    });
+
+    // 全选/全不选
+    $("#check_all").click(function(){
+        var isChecked = $(this).prop("checked");
+        $(".check_item").prop("checked", isChecked);
+    });
+
+    $(document).on("click", ".check_item", function () {
+        var isAllChecked = $(".check_item:checked").length===$(".check_item").length;
+        $("#check_all").prop("checked", isAllChecked);
     });
 </script>
 
