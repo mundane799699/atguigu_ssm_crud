@@ -218,6 +218,8 @@
                 .addClass("btn btn-danger btn-sm btn_delete")
                 .append($("<span></span>").addClass("glyphicon glyphicon-trash"))
                 .append("删除");
+            // 为删除按钮添加一个自定义属性来表示当前删除的员工id
+            btnDelete.attr("del-id", item.empId);
 
             var tdBtn = $("<td></td>").append(btnEdit).append(" ").append(btnDelete);
             $("<tr></tr>").append(idTd)
@@ -485,6 +487,23 @@
                 toPage(currentNum);
             }
         });
+
+    });
+
+    // 单个删除
+    $(document).on("click", ".btn_delete", function(){
+        var empName = $(this).parents("tr").find("td:eq(1)").text();
+        var empId = $(this).attr("del-id");
+        if(confirm("确认删除【"+empName+"】吗?")){
+            $.ajax({
+                url: "emp/" + empId,
+                type: "DELETE",
+                success: function(result){
+                    alert(result.msg);
+                    toPage(currentNum);
+                }
+            });
+        }
 
     });
 </script>
