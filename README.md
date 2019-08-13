@@ -6,7 +6,7 @@
 
 对应b站视频[av35988777](https://www.bilibili.com/video/av35988777)
 
-其中mybatis-generator工程使用了mybatis逆向工程用于生成mapper、接口类等文件
+其中mybatis-generator工程使用了mybatis逆向工程用于生成mapper、接口类等文件, 请参照[IDEA—Mybatis逆向工程](https://www.jianshu.com/p/c89a888a53e3)这篇博客生成文件, 然后将生成的文件拷贝至ssm-crud工程
 
 运行项目请使用ssm-crud
 
